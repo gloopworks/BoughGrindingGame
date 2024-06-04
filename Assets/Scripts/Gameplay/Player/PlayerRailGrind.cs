@@ -162,7 +162,7 @@ namespace MixJam12.Gameplay.Player
         {
             float t = SnapToRail(currentRailTransform, currentRail);
 
-            if (((t >= 0.97f && grindDirection > 0) || (t <= 0.0f && grindDirection < 0)) && !currentRail.Closed)
+            if ((GetRemainingLength(t) < 0.2f) && !currentRail.Closed)
             {
                 EndRailGrind();
                 return;
@@ -175,6 +175,16 @@ namespace MixJam12.Gameplay.Player
             currentGrindSpeed = Mathf.MoveTowards(currentGrindSpeed, targetGrindSpeed, grindAcceleration * Time.fixedDeltaTime);
 
             body.velocity = velocity * currentGrindSpeed;
+        }
+
+        private float GetRemainingLength(float t)
+        {
+            if (grindDirection > 0)
+            {
+                return currentRail.GetLength() * (1 - t);
+            }
+
+            return currentRail.GetLength() * t;
         }
     }
 }
