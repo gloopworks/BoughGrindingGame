@@ -22,17 +22,8 @@ namespace MixJam12.Gameplay.Player
                 HeightDifference = heightDifference;
             }
         }
-        public class OnJumpEventArgs : System.EventArgs
-        {
-            public float JumpForce { get; private set; }
-            public OnJumpEventArgs(float jumpForce)
-            {
-                JumpForce = jumpForce;
-            }
-        }
 
         public event System.EventHandler<OnCrouchEventArgs> OnCrouchEvent;
-        public event System.EventHandler<OnJumpEventArgs> OnJumpEvent;
         #endregion
 
         #region Serialized
@@ -49,10 +40,7 @@ namespace MixJam12.Gameplay.Player
 
         [Space, SerializeField, Range(0f, 30f)] private float groundFriction = 8f;
         [SerializeField, Range(0f, 30f)] private float slideFriction = 1f;
-
-        [Header("Jump Values")]
-        [SerializeField, Range(0f, 30f)] private float jumpForce = 16f;
-        [SerializeField, Range(0f, 1f)] private float jumpBuffer = 0.1f;
+        [SerializeField, Range(0f, 30f)] private float airFriction = 1f;
 
         [Header("Crouch/Slide Values")]
         [SerializeField, Range(0f, 5f)] private float defaultPlayerHeight = 3f;
@@ -67,6 +55,7 @@ namespace MixJam12.Gameplay.Player
         #region Exposed
         public bool IsCrouched { get; private set; }
         public bool IsSliding => IsCrouched && slideCounter > 0f && collisionCheck.OnSurface;
+        public bool InputsEnabled { get; private set; }
         public Vector3 WishDir { get; private set; }
         #endregion
 
@@ -74,16 +63,6 @@ namespace MixJam12.Gameplay.Player
         private Rigidbody body;
         private CollisionCheck collisionCheck;
         private BoxCollider boxCollider;
-
-        private float jumpBufferCounter;
-        private bool jumpingThisFrame;
-        private float BodyYVelocity
-        {
-            set
-            {
-                body.velocity = new Vector3(body.velocity.x, value, body.velocity.z);
-            }
-        }
 
         private Vector3 moveInput;
 
@@ -113,8 +92,6 @@ namespace MixJam12.Gameplay.Player
             playerInput.actions["Player/Move"].performed += ReceiveMoveInput;
             playerInput.actions["Player/Move"].canceled += ReceiveMoveInput;
 
-            playerInput.actions["Player/Jump"].performed += ReceiveJumpInput;
-
             playerInput.actions["Player/Crouch"].performed += ReceiveCrouchInput;
             playerInput.actions["Player/Crouch"].canceled += ReceiveCrouchInput;
         }
@@ -123,8 +100,6 @@ namespace MixJam12.Gameplay.Player
         {
             playerInput.actions["Player/Move"].performed -= ReceiveMoveInput;
             playerInput.actions["Player/Move"].canceled -= ReceiveMoveInput;
-
-            playerInput.actions["Player/Jump"].performed -= ReceiveJumpInput;
 
             playerInput.actions["Player/Crouch"].performed -= ReceiveCrouchInput;
             playerInput.actions["Player/Crouch"].canceled -= ReceiveCrouchInput;
@@ -143,27 +118,25 @@ namespace MixJam12.Gameplay.Player
             {
                 slideCounter -= Time.fixedDeltaTime;
             }
+        }
 
-            if (jumpBufferCounter > 0f && collisionCheck.OnSurface && !jumpingThisFrame)
-            {
-                Jump();
-                return;
-            }
-            jumpBufferCounter -= Time.fixedDeltaTime;
-            jumpingThisFrame = false;
+        public void DisableInputs()
+        {
+            UnsubscribeFromInputActions();
+            moveInput = Vector3.zero;
+            crouchInput = false;
+
+            InputsEnabled = false;
+        }
+
+        public void EnableInputs()
+        {
+            SubscribeToInputActions();
+
+            InputsEnabled = true;
         }
 
         #region Input Methods
-        private void ReceiveJumpInput(InputAction.CallbackContext ctx)
-        {
-            if (collisionCheck.OnSurface)
-            {
-                Jump();
-                return;
-            }
-            jumpBufferCounter = jumpBuffer;
-        }
-
         private void ReceiveMoveInput(InputAction.CallbackContext ctx)
         {
             Vector2 input = ctx.ReadValue<Vector2>();
@@ -178,15 +151,6 @@ namespace MixJam12.Gameplay.Player
 
         #region Movement Methods
 
-        private void Jump()
-        {
-            BodyYVelocity = jumpForce;
-            jumpBufferCounter = 0f;
-            jumpingThisFrame = true;
-
-            OnJumpEvent?.Invoke(this, new(jumpForce));
-        }
-
         private void OnHitGround(object sender, OnHitGroundEventArgs args)
         {
             if (IsCrouched && body.velocity.ExcludeYAxis().sqrMagnitude > 0.1f)
@@ -200,7 +164,7 @@ namespace MixJam12.Gameplay.Player
         {
             if (!IsCrouched && crouchInput)
             {
-                EnterCrouch();
+                EnterCrouch(collisionCheck.OnSurface);
             }
 
             if (IsCrouched && !crouchInput && CanExitCrouch())
@@ -209,14 +173,16 @@ namespace MixJam12.Gameplay.Player
             }
         }
 
-        private void EnterCrouch()
+        public void EnterCrouch(bool onSurface)
         {
+            Debug.Log("Crouch");
+
             IsCrouched = true;
 
             boxCollider.size = new Vector3(boxCollider.size.x, crouchedHeight, boxCollider.size.z);
             boxCollider.center -= heightDifference / 2 * Vector3.up;
 
-            if (body.velocity.ExcludeYAxis().sqrMagnitude > 0.1f && collisionCheck.OnSurface)
+            if (body.velocity.ExcludeYAxis().sqrMagnitude > 0.1f && onSurface)
             {
                 EnterSlide(false);
             }
@@ -241,8 +207,10 @@ namespace MixJam12.Gameplay.Player
         #endregion
 
         #region Slide
-        private void EnterSlide(bool landingSlide)
+        public void EnterSlide(bool landingSlide)
         {
+            Debug.Log("Slide");
+
             slideCounter = CalculateSlideDuration(out float proportion);
             Vector3 direction = collisionCheck.OnGround ? body.velocity.ExcludeYAxis().normalized : body.velocity.normalized;
             float slideForce = landingSlide ? landingSlideForce : groundSlideForce;
@@ -297,6 +265,7 @@ namespace MixJam12.Gameplay.Player
         {
             if (!collisionCheck.OnSurface)
             {
+                body.AddForce(body.velocity * -airFriction);
                 return;
             }
             if (IsSliding)

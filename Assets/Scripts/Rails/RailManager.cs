@@ -19,8 +19,8 @@ namespace MixJam12.Gameplay.Rails
         public static RailManager Instance { get; private set; }
         private SplineInstantiate[] splineInstantiators;
 
-        public event System.EventHandler<RailTriggerEventArgs> OnRailEnteredEvent;
-        public event System.EventHandler<RailTriggerEventArgs> OnRailExitedEvent;
+        public event System.EventHandler<RailTriggerEventArgs> OnRailTriggerEnteredEvent;
+        public event System.EventHandler<RailTriggerEventArgs> OnRailTriggerExitedEvent;
 
         private void Awake()
         {
@@ -31,20 +31,24 @@ namespace MixJam12.Gameplay.Rails
             }
 
             Instance = this;
+            UpdateSplineInstantiators();
+        }
 
+        public void UpdateSplineInstantiators()
+        {
             splineInstantiators = FindObjectsOfType<SplineInstantiate>();
         }
 
         public void OnRailEntered(Transform root)
         {
             SplineInstantiate instantiator = FindSplineInstantiate(root);
-            OnRailEnteredEvent?.Invoke(this, new RailTriggerEventArgs(instantiator));
+            OnRailTriggerEnteredEvent?.Invoke(this, new RailTriggerEventArgs(instantiator));
         }
 
         public void OnRailExited(Transform root)
         {
             SplineInstantiate instantiator = FindSplineInstantiate(root);
-            OnRailExitedEvent?.Invoke(this, new RailTriggerEventArgs(instantiator));
+            OnRailTriggerExitedEvent?.Invoke(this, new RailTriggerEventArgs(instantiator));
         }
 
         private SplineInstantiate FindSplineInstantiate(Transform root)

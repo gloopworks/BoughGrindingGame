@@ -11,7 +11,7 @@ namespace MixJam12.Gameplay.Rails
 
         private void OnTriggerExit(Collider collider)
         {
-            RailManager.Instance.OnRailEntered(transform.parent);
+            RailManager.Instance.OnRailExited(transform.parent);
         }
     }
 }
