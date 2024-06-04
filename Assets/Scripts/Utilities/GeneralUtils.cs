@@ -18,5 +18,10 @@ namespace MixJam12.Utilities
 
             return cachedPlayerInput;
         }
+
+        public static Vector3 ExcludeYAxis(this Vector3 input)
+        {
+            return new Vector3(input.x, 0f, input.z);
+        }
     }
 }
