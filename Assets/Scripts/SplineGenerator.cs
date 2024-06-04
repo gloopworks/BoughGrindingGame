@@ -1,42 +1,54 @@
 using UnityEngine;
 using UnityEngine.Splines;
 
-public class SplineGenerator : MonoBehaviour
+using MixJam12.Gameplay;
+
+namespace MixJam12
 {
-    [SerializeField] private SplineContainer splineContainer;
-    [SerializeField] private SplineExtrude splineExtrude;
-
-    [Space]
-
-    [SerializeField] private float spread = 1f;
-
-    private void Awake()
+    public class SplineGenerator : MonoBehaviour
     {
-        splineExtrude.enabled = false;
-    }
+        [SerializeField] private SplineContainer splineContainer;
+        [SerializeField] private ScreenClicker screenClicker;
 
-    private void Start()
-    {
-        CreateSpline(Vector3.zero, Vector3.one, Vector3.up * 5f);
-        splineExtrude.enabled = true;
-        splineExtrude.Rebuild();
-    }
+        [Space]
 
-    private void CreateSpline(params Vector3[] pathPoints)
-    {
-        Spline spline = splineContainer.AddSpline();
+        [SerializeField] private float tangentDistance = 1f;
 
-        BezierKnot[] knots = new BezierKnot[pathPoints.Length];
-        for (int i = 0; i < pathPoints.Length; i++)
+        private void Start()
         {
-            knots[i] = new BezierKnot
-            (
-                pathPoints[i],
-                -spread * Vector3.forward,
-                spread * Vector3.forward
-            );
+            screenClicker.OnScreenClickedEvent += OnScreenClicked;
         }
 
-        spline.Knots = knots;
+        private void OnScreenClicked(object sender, ScreenClicker.OnScreenClickedEventArgs args)
+        {
+            AddKnotToSpline(args.Direction, args.Point, args.Normal);
+        }
+
+        private void AddKnotToSpline(Vector3 direction, Vector3 point, Vector3 normal)
+        {
+            bool newSpline = TryAddSpline(out Spline spline);
+
+            Vector3 position = point;
+            if (!newSpline)
+            {
+                direction = position - (Vector3)spline[^1].Position;
+            }
+
+            direction = Vector3.ProjectOnPlane(direction, normal).normalized;
+
+            spline.Add(new(position, -tangentDistance * direction, tangentDistance * direction), TangentMode.Continuous);
+        }
+
+        private bool TryAddSpline(out Spline spline)
+        {
+            if (splineContainer.Splines.Count > 0)
+            {
+                spline = splineContainer.Splines[0];
+                return false;
+            }
+
+            spline = splineContainer.AddSpline();
+            return true;
+        }
     }
 }
