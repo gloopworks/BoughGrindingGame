@@ -8,11 +8,17 @@ namespace MixJam12
     public class SplineGenerator : MonoBehaviour
     {
         [SerializeField] private SplineContainer splineContainer;
+        [SerializeField] private SplineExtrude splineExtrude;
         [SerializeField] private ScreenClicker screenClicker;
 
         [Space]
 
         [SerializeField] private float tangentDistance = 1f;
+
+        private void Awake()
+        {
+            splineExtrude.enabled = false;
+        }
 
         private void Start()
         {
@@ -37,6 +43,7 @@ namespace MixJam12
             direction = Vector3.ProjectOnPlane(direction, normal).normalized;
 
             spline.Add(new(position, -tangentDistance * direction, tangentDistance * direction), TangentMode.Continuous);
+            splineExtrude.Rebuild();
         }
 
         private bool TryAddSpline(out Spline spline)
@@ -48,6 +55,7 @@ namespace MixJam12
             }
 
             spline = splineContainer.AddSpline();
+            splineExtrude.enabled = true;
             return true;
         }
     }
