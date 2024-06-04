@@ -31,10 +31,12 @@ namespace MixJam12.Gameplay.Player
 
         [Space]
 
-        [SerializeField, Range(0.0f, 1.0f)] private float verticalOffset;
+        [SerializeField, Range(0.0f, 10.0f)] private float verticalOffset;
         [SerializeField, Range(0.5f, 5.0f)] private float exitDistanceThreshold;
 
         private Rigidbody body;
+
+        private Transform currentRailTransform;
         private Spline currentRail;
         private GrindState grindState;
 
@@ -74,18 +76,18 @@ namespace MixJam12.Gameplay.Player
         {
             if (grindState == GrindState.Inactive)
             {
-                StartRailGrind(args.Container.Spline);
+                StartRailGrind(args.Container.transform, args.Container.Spline);
             }
         }
 
-        private void StartRailGrind(Spline spline)
+        private void StartRailGrind(Transform parent, Spline spline)
         {
             Debug.Log("Start Grind");
 
             playerMovement.DisableInputs();
             playerJump.DisableInputs();
 
-            float t = SnapToRail(spline, out _);
+            float t = SnapToRail(parent, spline);
             CalculateGrindDir(spline, t);
 
             grindState = GrindState.Grinding;
@@ -93,6 +95,7 @@ namespace MixJam12.Gameplay.Player
             body.excludeLayers = railLayer;
 
             currentRail = spline;
+            currentRailTransform = parent;
         }
 
         private void EndRailGrind()
@@ -107,12 +110,15 @@ namespace MixJam12.Gameplay.Player
             grindState = GrindState.Exiting;
         }
 
-        private float SnapToRail(Spline spline, out float distance)
+        private float SnapToRail(Transform parent, Spline spline)
         {
-            distance = GetNearestPoint(spline, body.position, out var nearestPoint, out float t);
+            Vector3 localPoint = parent.InverseTransformPoint(body.position);
+            _ = GetNearestPoint(spline, localPoint, out var nearestPoint, out float t);
 
             Vector3 up = spline.EvaluateUpVector(t);
-            body.position = (Vector3)nearestPoint + (up * verticalOffset);
+
+            Vector3 global = parent.TransformPoint(nearestPoint);
+            body.position = global + (up * verticalOffset);
 
             return t;
         }
@@ -137,20 +143,26 @@ namespace MixJam12.Gameplay.Player
 
             if (grindState == GrindState.Exiting)
             {
-                float distance = GetNearestPoint(currentRail, body.position, out _, out _);
+                TryExitGrind();
+            }
+        }
 
-                if (distance >= exitDistanceThreshold)
-                {
-                    grindState = GrindState.Inactive;
-                }
+        private void TryExitGrind()
+        {
+            Vector3 localPoint = currentRailTransform.InverseTransformPoint(body.position);
+            float distance = GetNearestPoint(currentRail, localPoint, out _, out _);
+
+            if (distance >= exitDistanceThreshold)
+            {
+                grindState = GrindState.Inactive;
             }
         }
 
         private void ProcessGrindMovement()
         {
-            float t = SnapToRail(currentRail, out float distance);
+            float t = SnapToRail(currentRailTransform, currentRail);
 
-            if ((t == 1 || t == 0) && distance >= exitDistanceThreshold)
+            if (((t >= 0.97f && grindDirection > 0) || (t <= 0.0f && grindDirection < 0)) && !currentRail.Closed)
             {
                 EndRailGrind();
                 return;

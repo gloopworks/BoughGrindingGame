@@ -123,6 +123,70 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &20722900
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 20722901}
+  - component: {fileID: 20722902}
+  - component: {fileID: 20722903}
+  m_Layer: 7
+  m_Name: Spells
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &20722901
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 20722900}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 386398678}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &20722902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 20722900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55a67af19f5a4cf4f94796a756935d01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &20722903
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 20722900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7215bfcb6eb25d4d9dfd641863bc478, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lookTransform: {fileID: 2130613794}
+  groundLayers:
+    serializedVersion: 2
+    m_Bits: 9
+  railPrefab: {fileID: 7922883137609953170, guid: 0d8aeb9788f0f6f4291855a67e65d33f, type: 3}
+  offsetFromWall: 1
+  tangentDistance: 2
 --- !u!1 &71019731
 GameObject:
   m_ObjectHideFlags: 0
@@ -271,7 +335,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 386398678}
-  - component: {fileID: 386398684}
   - component: {fileID: 386398683}
   - component: {fileID: 386398686}
   - component: {fileID: 386398685}
@@ -279,7 +342,7 @@ GameObject:
   - component: {fileID: 386398681}
   - component: {fileID: 386398679}
   - component: {fileID: 386398680}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -299,6 +362,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2031936799}
+  - {fileID: 20722901}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -407,18 +471,6 @@ MonoBehaviour:
   minSlideDuration: 0.8
   groundSlideForce: 8
   landingSlideForce: 4
---- !u!114 &386398684
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 386398677}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 55a67af19f5a4cf4f94796a756935d01, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &386398685
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -453,8 +505,8 @@ MonoBehaviour:
   downwardGrindSpeed: 40
   upwardGrindSpeed: 1
   grindAcceleration: 8
-  verticalOffset: 0.8
-  exitDistanceThreshold: 2.5
+  verticalOffset: 1.6
+  exitDistanceThreshold: 3
 --- !u!1 &441254269
 GameObject:
   m_ObjectHideFlags: 0
@@ -1548,7 +1600,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2031936799}
   - component: {fileID: 2031936800}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: CameraFollow
   m_TagString: Untagged
   m_Icon: {fileID: 0}

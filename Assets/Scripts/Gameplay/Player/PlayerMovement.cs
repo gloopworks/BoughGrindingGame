@@ -55,7 +55,7 @@ namespace MixJam12.Gameplay.Player
         #region Exposed
         public bool IsCrouched { get; private set; }
         public bool IsSliding => IsCrouched && slideCounter > 0f && collisionCheck.OnSurface;
-        public bool InputsEnabled { get; private set; }
+        public bool InputsEnabled { get; private set; } = true;
         public Vector3 WishDir { get; private set; }
         #endregion
 
@@ -122,7 +122,6 @@ namespace MixJam12.Gameplay.Player
 
         public void DisableInputs()
         {
-            UnsubscribeFromInputActions();
             moveInput = Vector3.zero;
             crouchInput = false;
 
@@ -248,6 +247,11 @@ namespace MixJam12.Gameplay.Player
         #region Calculation
         private Vector3 CalculateWishDir()
         {
+            if (!InputsEnabled)
+            {
+                return Vector3.zero;
+            }
+
             Vector3 wishDir = lookTransform.forward * moveInput.z;
             wishDir += lookTransform.right * moveInput.x;
 
