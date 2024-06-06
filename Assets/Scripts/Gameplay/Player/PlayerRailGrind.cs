@@ -3,6 +3,7 @@ using UnityEngine.Splines;
 using UnityEngine.InputSystem;
 
 using static UnityEngine.Splines.SplineUtility;
+using static MixJam12.Utilities.GeneralUtils;
 
 using MixJam12.Gameplay.Rails;
 using MixJam12.Enumerations;
@@ -17,11 +18,7 @@ namespace MixJam12.Gameplay.Player
         [SerializeField] private PlayerMovement playerMovement;
         [SerializeField] private PlayerJump playerJump;
 
-        [Header("Grinding")]
-        [SerializeField] private LayerMask railLayer;
-
-        [Space]
-
+        [Header("Grind Speed Values")]
         [SerializeField, Range(0.0f, 100.0f)] private float downwardGrindSpeed = 20.0f;
         [SerializeField, Range(0.0f, 100.0f)] private float upwardGrindSpeed = 20.0f;
 
@@ -29,9 +26,16 @@ namespace MixJam12.Gameplay.Player
 
         [SerializeField] private float grindAcceleration = 10f;
 
+        [Header("Grind Settings")]
+        [SerializeField] private LayerMask railLayer;
+
         [Space]
 
         [SerializeField, Range(0.0f, 10.0f)] private float verticalOffset;
+        [SerializeField, Range(0.0f, 5.0f)] private float snapDistanceThreshold;
+
+        [Space]
+
         [SerializeField, Range(0.5f, 5.0f)] private float exitDistanceThreshold;
 
         private Rigidbody body;
@@ -44,6 +48,8 @@ namespace MixJam12.Gameplay.Player
 
         private float currentGrindSpeed;
         private float targetGrindSpeed;
+
+        private Vector3 railExitPosition;
 
         public override void Start()
         {
@@ -67,7 +73,7 @@ namespace MixJam12.Gameplay.Player
         {
             if (grindState == GrindState.Grinding)
             {
-                EndRailGrind();
+                EndRailGrind(body.position);
                 playerJump.Jump();
             }
         }
@@ -87,7 +93,7 @@ namespace MixJam12.Gameplay.Player
             playerMovement.DisableInputs();
             playerJump.DisableInputs();
 
-            float t = SnapToRail(parent, spline);
+            body.position = GetTargetRailPosition(parent, spline, out float t);
             CalculateGrindDir(spline, t);
 
             grindState = GrindState.Grinding;
@@ -98,7 +104,7 @@ namespace MixJam12.Gameplay.Player
             currentRailTransform = parent;
         }
 
-        private void EndRailGrind()
+        private void EndRailGrind(Vector3 railPosition)
         {
             Debug.Log("Exit Grind");
 
@@ -107,20 +113,19 @@ namespace MixJam12.Gameplay.Player
 
             body.excludeLayers = 0;
 
+            railExitPosition = railPosition;
             grindState = GrindState.Exiting;
         }
 
-        private float SnapToRail(Transform parent, Spline spline)
+        private Vector3 GetTargetRailPosition(Transform parent, Spline spline, out float t)
         {
             Vector3 localPoint = parent.InverseTransformPoint(body.position);
-            _ = GetNearestPoint(spline, localPoint, out var nearestPoint, out float t);
+            _ = GetNearestPoint(spline, localPoint, out var nearestPoint, out t);
 
             Vector3 up = spline.EvaluateUpVector(t);
 
             Vector3 global = parent.TransformPoint(nearestPoint);
-            body.position = global + (up * verticalOffset);
-
-            return t;
+            return global + (up * verticalOffset);
         }
 
         private void CalculateGrindDir(Spline spline, float t)
@@ -149,10 +154,9 @@ namespace MixJam12.Gameplay.Player
 
         private void TryExitGrind()
         {
-            Vector3 localPoint = currentRailTransform.InverseTransformPoint(body.position);
-            float distance = GetNearestPoint(currentRail, localPoint, out _, out _);
+            float sqrThreshold = Mathf.Pow(exitDistanceThreshold, 2);
 
-            if (distance >= exitDistanceThreshold)
+            if (SqrDistance(railExitPosition, body.position) > sqrThreshold)
             {
                 grindState = GrindState.Inactive;
             }
@@ -160,21 +164,23 @@ namespace MixJam12.Gameplay.Player
 
         private void ProcessGrindMovement()
         {
-            float t = SnapToRail(currentRailTransform, currentRail);
+            Vector3 targetPosition = GetTargetRailPosition(currentRailTransform, currentRail, out float railT);
+            Vector3 towardsTarget = (targetPosition - body.position).normalized;
+            float distanceT = SqrDistance(targetPosition, body.position) / Mathf.Pow(snapDistanceThreshold, 2);
 
-            if ((GetRemainingLength(t) < 0.2f) && !currentRail.Closed)
+            if ((GetRemainingLength(railT) < 0.2f) && !currentRail.Closed)
             {
-                EndRailGrind();
+                EndRailGrind(body.position);
                 return;
             }
 
-            Vector3 tangent = currentRail.EvaluateTangent(t);
+            Vector3 tangent = currentRail.EvaluateTangent(railT);
             Vector3 velocity = tangent.normalized * grindDirection;
 
             targetGrindSpeed = Mathf.Lerp(downwardGrindSpeed, upwardGrindSpeed, velocity.y.Remap01(-1.0f, 1.0f));
             currentGrindSpeed = Mathf.MoveTowards(currentGrindSpeed, targetGrindSpeed, grindAcceleration * Time.fixedDeltaTime);
 
-            body.velocity = velocity * currentGrindSpeed;
+            body.velocity = Vector3.Lerp(velocity, towardsTarget, distanceT) * currentGrindSpeed;
         }
 
         private float GetRemainingLength(float t)

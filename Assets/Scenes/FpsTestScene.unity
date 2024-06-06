@@ -484,7 +484,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d6d2469d81da15542bc2edd7a8a3007e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpForce: 12
+  jumpForce: 14
   jumpBuffer: 0.1
 --- !u!114 &386398686
 MonoBehaviour:
@@ -500,14 +500,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerMovement: {fileID: 386398683}
   playerJump: {fileID: 386398685}
-  railLayer:
-    serializedVersion: 2
-    m_Bits: 64
   downwardGrindSpeed: 30
   upwardGrindSpeed: 1
   grindAcceleration: 8
+  railLayer:
+    serializedVersion: 2
+    m_Bits: 64
   verticalOffset: 1.6
-  exitDistanceThreshold: 3
+  snapDistanceThreshold: 1
+  exitDistanceThreshold: 4
 --- !u!1 &441254269
 GameObject:
   m_ObjectHideFlags: 0

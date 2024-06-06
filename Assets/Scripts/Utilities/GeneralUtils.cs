@@ -24,6 +24,11 @@ namespace MixJam12.Utilities
             return new Vector3(input.x, 0f, input.z);
         }
 
+        public static float SqrDistance(Vector3 target, Vector3 current)
+        {
+            return (target - current).sqrMagnitude;
+        }
+
         public static float Remap(this float input, float inputMin, float inputMax, float outputMin, float outputMax)
         {
             return (input - inputMin) / (inputMax - inputMin) * (outputMax - outputMin) + outputMin;
