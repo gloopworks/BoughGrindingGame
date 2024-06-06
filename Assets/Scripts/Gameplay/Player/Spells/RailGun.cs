@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.Splines;
 
 using static UnityEngine.Splines.SplineUtility;
+using static MixJam12.Utilities.GeneralUtils;
 
 using MixJam12.Gameplay.Rails;
 
@@ -25,12 +26,22 @@ namespace MixJam12.Gameplay.Player.Spells
         private SplineInstantiate currentInstantiate;
 
         [Header("Placement")]
-        [SerializeField] private float offsetFromWall = 0.5f;
-        [SerializeField] private float tangentDistance = 2f;
+        [SerializeField] private LayerMask layersBlockingPlacement;
 
         [Space]
 
-        [SerializeField] private float minDistanceFromSpline = 1.5f;
+        [SerializeField, Range(0.0f, 10.0f)] private float floorOffset = 0.5f;
+        [SerializeField, Range(0.0f, 10.0f)] private float ceilingOffset = 3f;
+
+        [Space]
+
+        [SerializeField, Range(0.0f, 50.0f)] private float maxTangentDistance = 10f;
+        [SerializeField, Range(0.0f, 50.0f)] private float minTangentDistance = 1f;
+        [SerializeField] private AnimationCurve tangentDistanceCurve;
+
+        [Space]
+
+        [SerializeField, Range(0.0f, 10.0f)] private float initialRailLength = 5f;
 
         private bool createNewContainer = true;
 
@@ -64,10 +75,8 @@ namespace MixJam12.Gameplay.Player.Spells
         {
             Ray ray = new(lookTransform.position, lookTransform.forward);
 
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f, groundLayers))
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f, groundLayers, QueryTriggerInteraction.Ignore))
             {
-                Debug.Log(LayerMask.LayerToName(hit.transform.gameObject.layer));
-
                 if (createNewContainer)
                 {
                     InstantiateSplineContainer(ray.direction, hit.point, hit.normal);
@@ -80,32 +89,50 @@ namespace MixJam12.Gameplay.Player.Spells
         }
         private bool TryAddKnotToSpline(Vector3 direction, Vector3 point, Vector3 normal)
         {
-            Vector3 placement = point + (normal * offsetFromWall);
-            Vector3 forward = (placement - (Vector3)currentSpline[^1].Position).normalized;
-            forward = Vector3.ProjectOnPlane(forward, normal);
+            Vector3 worldPlacement = point + (normal * GetSurfaceOffset(normal.y));
+            Vector3 worldPrevious = splineTransform.TransformPoint(currentSpline[^1].Position);
+            Vector3 forward = worldPlacement - worldPrevious;
+            forward = Vector3.ProjectOnPlane(forward, normal).ExcludeYAxis();
+            forward = forward.normalized;
 
-            Vector3 localPlacement = splineTransform.InverseTransformPoint(placement);
+            Vector3 localPlacement = splineTransform.InverseTransformPoint(worldPlacement);
+            Vector3 previousTangent = (Quaternion)currentSpline[^1].Rotation * (Vector3)currentSpline[^1].TangentOut;
 
-            if (GetNearestPoint(currentSpline, localPlacement, out _, out _) < minDistanceFromSpline)
+            Vector3 rayOrigin = worldPrevious + previousTangent;
+            float maxDistance = (worldPlacement - rayOrigin).magnitude;
+
+            Ray ray = new(rayOrigin, worldPlacement - rayOrigin);
+            Debug.DrawRay(rayOrigin, worldPlacement - rayOrigin, Color.magenta, 5f);
+            if (Physics.Raycast(ray, maxDistance, layersBlockingPlacement, QueryTriggerInteraction.Ignore))
             {
                 return false;
             }
 
-            Debug.DrawRay(point, normal * offsetFromWall, Color.green, 5f);
-            Debug.DrawRay(placement, forward * tangentDistance, Color.red, 5f);
-
-            currentSpline.Add(new(localPlacement, -tangentDistance * forward, tangentDistance * forward), TangentMode.Mirrored);
-
-            currentExtrude.Rebuild();
-            currentInstantiate.UpdateInstances();
+            Debug.DrawRay(point, normal * GetSurfaceOffset(normal.y), Color.green, 5f);
+            AddKnotToSpline(forward, previousTangent, localPlacement);
 
             return true;
         }
 
+        private void AddKnotToSpline(Vector3 forward, Vector3 previousTangent, Vector3 localPlacement)
+        {
+            float adjustedTangentLength = GetAdjustedTangentLength(forward, previousTangent);
+
+            currentSpline.Add(new(localPlacement, -adjustedTangentLength * forward, adjustedTangentLength * forward), TangentMode.Continuous);
+
+            Vector3 worldPlacement = splineTransform.TransformPoint(localPlacement);
+            Vector3 worldPrevious = splineTransform.TransformPoint(currentSpline[^1].Position);
+            Debug.DrawRay(worldPlacement, adjustedTangentLength * forward, Color.red, 10f);
+            Debug.DrawRay(worldPrevious, previousTangent, Color.yellow, 10f);
+
+            currentExtrude.Rebuild();
+            currentInstantiate.UpdateInstances();
+        }
+
         private void InstantiateSplineContainer(Vector3 direction, Vector3 point, Vector3 normal)
         {
-            Vector3 forward = Vector3.ProjectOnPlane(direction, normal).normalized;
-            Vector3 placement = point + (normal * offsetFromWall);
+            Vector3 forward = Vector3.ProjectOnPlane(direction, normal).ExcludeYAxis().normalized;
+            Vector3 placement = point + (normal * GetSurfaceOffset(normal.y));
 
             GameObject clone = Instantiate(railPrefab, placement, Quaternion.identity);
 
@@ -117,8 +144,8 @@ namespace MixJam12.Gameplay.Player.Spells
 
             currentSpline = container.Spline;
 
-            currentSpline[0] = new(-forward, -forward * tangentDistance, forward * tangentDistance);
-            currentSpline[1] = new(forward, -forward * tangentDistance, forward * tangentDistance);
+            currentSpline[0] = new(-forward * (initialRailLength / 2f), -forward, forward);
+            currentSpline[1] = new(forward * (initialRailLength / 2f), -forward, forward);
 
             clone.GetComponent<MeshFilter>().mesh = new Mesh();
 
@@ -126,6 +153,22 @@ namespace MixJam12.Gameplay.Player.Spells
             currentInstantiate.UpdateInstances();
 
             RailManager.Instance.UpdateSplineInstantiators();
+        }
+
+        private float GetSurfaceOffset(float yNormal)
+        {
+            float t = yNormal.Remap01(-1, 1);
+
+            return Mathf.Lerp(ceilingOffset, floorOffset, t);
+        }
+
+        private float GetAdjustedTangentLength(Vector3 forward, Vector3 previousTangent)
+        {
+            // Use the minimum tangent distance when both tangents are similar
+            float dot = Vector3.Dot(forward, previousTangent.normalized);
+            float t = tangentDistanceCurve.Evaluate(dot.Remap01(-1, 1));
+
+            return Mathf.Lerp(maxTangentDistance, minTangentDistance, t);
         }
     }
 }

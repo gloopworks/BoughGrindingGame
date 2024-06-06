@@ -122,7 +122,6 @@ namespace MixJam12.Gameplay.Player
 
         public void DisableInputs()
         {
-            moveInput = Vector3.zero;
             crouchInput = false;
 
             InputsEnabled = false;
