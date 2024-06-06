@@ -19,12 +19,14 @@ namespace MixJam12.Gameplay.Player
         [SerializeField] private PlayerJump playerJump;
 
         [Header("Grind Speed Values")]
-        [SerializeField, Range(0.0f, 100.0f)] private float downwardGrindSpeed = 20.0f;
-        [SerializeField, Range(0.0f, 100.0f)] private float upwardGrindSpeed = 20.0f;
+        [SerializeField, Range(0.0f, 100.0f)] private float downwardGrindSpeed = 30.0f;
+        [SerializeField, Range(0.0f, 100.0f)] private float upwardGrindSpeed = 1.0f;
+        [SerializeField] private float slidingSpeedMultiplier = 2f;
 
         [Space]
 
-        [SerializeField] private float grindAcceleration = 10f;
+        [SerializeField] private float slideAcceleration = 80f;
+        [SerializeField] private float grindAcceleration = 32f;
 
         [Header("Grind Settings")]
         [SerializeField] private LayerMask railLayer;
@@ -177,8 +179,16 @@ namespace MixJam12.Gameplay.Player
             Vector3 tangent = currentRail.EvaluateTangent(railT);
             Vector3 velocity = tangent.normalized * grindDirection;
 
-            targetGrindSpeed = Mathf.Lerp(downwardGrindSpeed, upwardGrindSpeed, velocity.y.Remap01(-1.0f, 1.0f));
-            currentGrindSpeed = Mathf.MoveTowards(currentGrindSpeed, targetGrindSpeed, grindAcceleration * Time.fixedDeltaTime);
+            if (playerMovement.IsCrouched)
+            {
+                targetGrindSpeed = Mathf.Lerp(downwardGrindSpeed * slidingSpeedMultiplier, upwardGrindSpeed / slidingSpeedMultiplier, velocity.y.Remap01(-1.0f, 1.0f));
+                currentGrindSpeed = Mathf.MoveTowards(currentGrindSpeed, targetGrindSpeed, slideAcceleration * Time.fixedDeltaTime);
+            }
+            else
+            {
+                targetGrindSpeed = Mathf.Lerp(downwardGrindSpeed, upwardGrindSpeed, velocity.y.Remap01(-1.0f, 1.0f));
+                currentGrindSpeed = Mathf.MoveTowards(currentGrindSpeed, targetGrindSpeed, grindAcceleration * Time.fixedDeltaTime);
+            }
 
             body.velocity = Vector3.Lerp(velocity, towardsTarget, distanceT) * currentGrindSpeed;
         }

@@ -122,15 +122,11 @@ namespace MixJam12.Gameplay.Player
 
         public void DisableInputs()
         {
-            crouchInput = false;
-
             InputsEnabled = false;
         }
 
         public void EnableInputs()
         {
-            SubscribeToInputActions();
-
             InputsEnabled = true;
         }
 
