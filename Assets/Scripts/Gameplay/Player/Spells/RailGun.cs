@@ -6,6 +6,7 @@ using static UnityEngine.Splines.SplineUtility;
 using static MixJam12.Utilities.GeneralUtils;
 
 using MixJam12.Gameplay.Rails;
+using MixJam12.FX.Rails;
 
 namespace MixJam12.Gameplay.Player.Spells
 {
@@ -22,7 +23,7 @@ namespace MixJam12.Gameplay.Player.Spells
         private Transform splineTransform;
 
         private Spline currentSpline;
-        private SplineExtrude currentExtrude;
+        private RailVisualHandler currentRailVisual;
         private SplineInstantiate currentInstantiate;
 
         [Header("Placement")]
@@ -84,7 +85,7 @@ namespace MixJam12.Gameplay.Player.Spells
                     return;
                 }
 
-                TryAddKnotToSpline(ray.direction, hit.point, hit.normal);
+                _ = TryAddKnotToSpline(ray.direction, hit.point, hit.normal);
             }
         }
         private bool TryAddKnotToSpline(Vector3 direction, Vector3 point, Vector3 normal)
@@ -125,7 +126,7 @@ namespace MixJam12.Gameplay.Player.Spells
             Debug.DrawRay(worldPlacement, adjustedTangentLength * forward, Color.red, 10f);
             Debug.DrawRay(worldPrevious, previousTangent, Color.yellow, 10f);
 
-            currentExtrude.Rebuild();
+            currentRailVisual.UpdateVisual();
             currentInstantiate.UpdateInstances();
         }
 
@@ -139,7 +140,7 @@ namespace MixJam12.Gameplay.Player.Spells
             splineTransform = clone.transform;
 
             SplineContainer container = clone.GetComponent<SplineContainer>();
-            currentExtrude = clone.GetComponent<SplineExtrude>();
+            currentRailVisual = clone.GetComponent<RailVisualHandler>();
             currentInstantiate = clone.GetComponent<SplineInstantiate>();
 
             currentSpline = container.Spline;
@@ -147,9 +148,7 @@ namespace MixJam12.Gameplay.Player.Spells
             currentSpline[0] = new(-forward * (initialRailLength / 2f), -forward, forward);
             currentSpline[1] = new(forward * (initialRailLength / 2f), -forward, forward);
 
-            clone.GetComponent<MeshFilter>().mesh = new Mesh();
-
-            currentExtrude.Rebuild();
+            currentRailVisual.InitializeVisual(currentSpline);
             currentInstantiate.UpdateInstances();
 
             RailManager.Instance.UpdateSplineInstantiators();

@@ -185,9 +185,20 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 9
   railPrefab: {fileID: 7922883137609953170, guid: 0d8aeb9788f0f6f4291855a67e65d33f, type: 3}
-  offsetFromWall: 1
-  tangentDistance: 4
-  minDistanceFromSpline: 1.5
+  layersBlockingPlacement:
+    serializedVersion: 2
+    m_Bits: 0
+  floorOffset: 0.5
+  ceilingOffset: 3
+  maxTangentDistance: 10
+  minTangentDistance: 1
+  tangentDistanceCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  initialRailLength: 5
 --- !u!1 &71019731
 GameObject:
   m_ObjectHideFlags: 0
@@ -502,6 +513,8 @@ MonoBehaviour:
   playerJump: {fileID: 386398685}
   downwardGrindSpeed: 30
   upwardGrindSpeed: 1
+  slidingSpeedMultiplier: 2
+  slideAcceleration: 80
   grindAcceleration: 8
   railLayer:
     serializedVersion: 2
@@ -1385,7 +1398,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 73f92f2520202554d8ff1304ae652a77, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

@@ -198,29 +198,47 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 0
-      outSlope: 0
+      inSlope: 2.7379637
+      outSlope: 2.7379637
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.22327481
     - serializedVersion: 3
-      time: 0.90839475
-      value: 0.3741517
-      inSlope: 1.4340554
-      outSlope: 1.4340554
+      time: 0.09860407
+      value: 0.0967869
+      inSlope: 0.06655054
+      outSlope: 0.06655054
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.08263086
-      outWeight: 0.33333334
+      inWeight: 1
+      outWeight: 0.1916535
+    - serializedVersion: 3
+      time: 0.61779344
+      value: 0.11080651
+      inSlope: -0.017466124
+      outSlope: -0.017466124
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.30321902
+      outWeight: 0.77763385
+    - serializedVersion: 3
+      time: 0.8499378
+      value: 0.2316151
+      inSlope: 1.6654273
+      outSlope: 1.6654273
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.2068924
+      outWeight: 0.40731704
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 2
-      outSlope: 2
+      inSlope: 7.2844543
+      outSlope: 7.2844543
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.14964855
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -823,13 +841,13 @@ MonoBehaviour:
   groundAcceleration: 120
   airAcceleration: 24
   groundFriction: 8
-  slideFriction: 1.8
-  airFriction: 0.4
+  slideFriction: 1.6
+  airFriction: 0.3
   defaultPlayerHeight: 1.8
   crouchedHeight: 1
   minSlideDuration: 0.8
-  groundSlideForce: 10
-  landingSlideForce: 7
+  groundSlideForce: 12
+  landingSlideForce: 8
 --- !u!114 &386398685
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -859,7 +877,7 @@ MonoBehaviour:
   playerMovement: {fileID: 386398683}
   playerJump: {fileID: 386398685}
   downwardGrindSpeed: 20
-  upwardGrindSpeed: 1
+  upwardGrindSpeed: 3
   slidingSpeedMultiplier: 1.5
   slideAcceleration: 80
   grindAcceleration: 24
