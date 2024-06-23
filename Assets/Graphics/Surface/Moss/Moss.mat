@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Moss
+  m_Shader: {fileID: 4800000, guid: 19dede3ed71219144842e485b10338a9, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BlotchTexture:
+        m_Texture: {fileID: 2800000, guid: 362053907d9177449bf6cc4e2051a7fa, type: 3}
+        m_Scale: {x: 0.008, y: 0.004}
+        m_Offset: {x: 0.02, y: 0}
+    - _DisplacementNoiseTexture:
+        m_Texture: {fileID: 2800000, guid: 362053907d9177449bf6cc4e2051a7fa, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NoiseTexture:
+        m_Texture: {fileID: 2800000, guid: d8887be45c3de834bbc33d8c93dfce33, type: 3}
+        m_Scale: {x: 0.2, y: 0.1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BlotchSize: 0.6
+    - _BlotchThreshold: 0.99
+    - _DisplacementStrength: 0.3
+    - _FadeLength: 0.6
+    - _HeightPower: 1
+    - _Length: 15.76
+    - _MaxDisplacementBreadth: 0.16
+    - _MinDisplacementBreadth: 0.01
+    - _NoiseMax: 0.6
+    - _NoiseMin: 0.4
+    - _NoisePower: 1
+    - _ShellCount: 16
+    - _ShellIndex: 0
+    m_Colors:
+    - _BaseColor: {r: 0.11627802, g: 0.3679245, b: 0.20637372, a: 1}
+    - _TipColor: {r: 0.38327694, g: 0.8207547, b: 0.38948235, a: 1}
+  m_BuildTextureStacks: []

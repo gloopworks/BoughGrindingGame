@@ -34,7 +34,7 @@ Material:
     - _NoiseMax: 1
     - _NoiseMin: 0
     - _OcclusionPeak: 1
-    - _ShellCount: 16
+    - _ShellCount: 4
     - _ShellIndex: 0
     m_Colors:
     - _BaseColor: {r: 0.10653258, g: 0.31218436, b: 0.3584906, a: 1}

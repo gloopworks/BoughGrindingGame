@@ -91,7 +91,7 @@ Shader "Custom/Rail"
 			{
 				Interpolators output;
 
-				float noise = SAMPLE_TEXTURE2D_LOD(_NoiseTexture, sampler_NoiseTexture, input.positionOS, 0).r;
+				float noise = SAMPLE_TEXTURE2D_LOD(_NoiseTexture, sampler_NoiseTexture, input.positionOS.xy, 0).r;
 
 				float3 positionOS = input.positionOS;
 				positionOS += input.normalOS * noise * _DisplacementStrength;
