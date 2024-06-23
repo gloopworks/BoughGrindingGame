@@ -2,11 +2,24 @@ Shader "Custom/Rail"
 {
     Properties
     {
-        _BaseColor ("Base Color", Color) = (0.5, 0.5, 0.5, 1)
+		[Header(Rail Properties)][Space]
+		_Length ("Length", Float) = 1
+
+		[Header(Lighting)][Space]
+		_BaseColor ("Base Color", Color) = (0.5, 0.5, 0.5, 1)
 
 		[Space]
 
-		_Length ("Length", Float) = 1
+		_NormalMap("Normal Map", 2D) = "white" {}
+		_NormalStrength("Normal Strength", Float) = 1
+
+		[Header(Displacement)][Space]
+		[NoScaleOffset] _NoiseTexture ("Noise Texture", 2D) = "white" {}
+
+		[Space]
+
+		_DisplacementStrength ("Displacement Strength", Float) = 0
+		_DisplacementBreadth ("Displacement Breadth", Float) = 0
     }
     SubShader
     {
@@ -39,8 +52,10 @@ Shader "Custom/Rail"
 			{
 				float3 positionOS : POSITION;
 				float3 normalOS : NORMAL;
+				float4 tangentOS : TANGENT;
 
-				float2 uv : TEXCOORD0;
+				float2 uv0 : TEXCOORD0;
+				float2 uv1 : TEXCOORD1;
 			};
 
 			struct Interpolators
@@ -48,29 +63,50 @@ Shader "Custom/Rail"
 				float4 positionCS : SV_POSITION;
 				float3 positionWS : TEXCOORD2;
 				float3 normalWS : TEXCOORD3;
+				float4 tangentWS : TEXCOORD4;
 
-				float2 uv : TEXCOORD0;
+				float2 uv0 : TEXCOORD0;
+				float2 uv1 : TEXCOORD1;
 
 				#ifdef _MAIN_LIGHT_SHADOWS
-					float4 shadowCoord : TEXCOORD4;
+					float4 shadowCoord : TEXCOORD5;
 				#endif
 			};
 
 			float4 _BaseColor;
 			float _Length;
 
+			TEXTURE2D(_NormalMap);
+			SAMPLER(sampler_NormalMap);
+			float4 _NormalMap_ST;
+			float _NormalStrength;
+
+			TEXTURE2D(_NoiseTexture);
+			SAMPLER(sampler_NoiseTexture);
+
+			float _DisplacementStrength;
+			float _DisplacementBreadth;
+
 			Interpolators Vertex(Attributes input)
 			{
 				Interpolators output;
-				
-				VertexPositionInputs pInputs = GetVertexPositionInputs(input.positionOS);
-				VertexNormalInputs nInputs = GetVertexNormalInputs(input.normalOS);
+
+				float noise = SAMPLE_TEXTURE2D_LOD(_NoiseTexture, sampler_NoiseTexture, input.positionOS, 0).r;
+
+				float3 positionOS = input.positionOS;
+				positionOS += input.normalOS * noise * _DisplacementStrength;
+				positionOS += input.normalOS * _DisplacementBreadth;
+
+				VertexPositionInputs pInputs = GetVertexPositionInputs(positionOS);
+				VertexNormalInputs nInputs = GetVertexNormalInputs(input.normalOS, input.tangentOS);
 
 				output.positionCS = pInputs.positionCS;
 				output.positionWS = pInputs.positionWS;
 				output.normalWS = nInputs.normalWS;
+				output.tangentWS = float4(nInputs.tangentWS, input.tangentOS.w);
 				
-				output.uv = input.uv;
+				output.uv0 = TRANSFORM_TEX(input.uv0, _NormalMap);
+				output.uv1 = input.uv1;
 
 				#ifdef _MAIN_LIGHT_SHADOWS
 					output.shadowCoord = GetShadowCoord(pInputs);
@@ -79,15 +115,11 @@ Shader "Custom/Rail"
 				return output;
 			}
 
-			float3 Diffuse(Interpolators input)
+			float3 Diffuse(float3 normalWS, float4 shadowCoord)
 			{
-				#ifdef _MAIN_LIGHT_SHADOWS
-					Light mainLight = GetMainLight(input.shadowCoord);
-				#else
-					Light mainLight = GetMainLight();
-				#endif
+				Light mainLight = GetMainLight(shadowCoord);
 
-				float NdotL = saturate(dot(input.normalWS, mainLight.direction));
+				float NdotL = saturate(dot(normalWS, mainLight.direction));
 				float3 mainDiffuse = mainLight.color * (mainLight.shadowAttenuation * mainLight.distanceAttenuation * NdotL);
 
 				return mainDiffuse;
@@ -95,12 +127,20 @@ Shader "Custom/Rail"
 
 			float4 Fragment(Interpolators input) : SV_TARGET
 			{
-				float3 bakedGI = SampleSH(input.normalWS);
-				float3 diffuse = Diffuse(input);
+				float3 normalTS = UnpackNormalScale(SAMPLE_TEXTURE2D(_NormalMap, sampler_NormalMap, input.uv0), _NormalStrength);
+				float3x3 tangentToWorld = CreateTangentToWorld(input.normalWS, input.tangentWS.xyz, input.tangentWS.w);
+				float3 normalWS = normalize(TransformTangentToWorld(normalTS, tangentToWorld));
+
+				float3 bakedGI = SampleSH(normalWS);
+				#ifdef _MAIN_LIGHT_SHADOWS
+					float3 diffuse = Diffuse(normalWS, input.shadowCoord);
+				#else
+					float3 diffuse = Diffuse(normalWS, float4(0, 0, 0, 0));
+				#endif
 
 				float3 lit = bakedGI + diffuse;
 
-				float a = step(input.uv.y, _Length);
+				float a = step(input.uv1.y, _Length);
 
 				return float4(lit * _BaseColor.rgb, a);
 			}
