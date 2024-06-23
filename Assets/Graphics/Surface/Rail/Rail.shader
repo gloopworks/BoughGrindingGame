@@ -3,16 +3,27 @@ Shader "Custom/Rail"
     Properties
     {
         _BaseColor ("Base Color", Color) = (0.5, 0.5, 0.5, 1)
+
+		[Space]
+
+		_Length ("Length", Float) = 1
     }
     SubShader
     {
-        Tags { "RenderPipeline" = "UniversalRenderPipeline" }
+        Tags
+		{ 
+			"RenderPipeline" = "UniversalRenderPipeline"
+			"RenderType" = "Transparent"
+			"Queue" = "Transparent"
+		}
 		LOD 100
 
 		Pass
 		{
 			Name "UniversalForward"
 			Tags { "LightMode" = "UniversalForward" }
+
+			Blend SrcAlpha OneMinusSrcAlpha
 
             HLSLPROGRAM
 
@@ -28,6 +39,8 @@ Shader "Custom/Rail"
 			{
 				float3 positionOS : POSITION;
 				float3 normalOS : NORMAL;
+
+				float2 uv : TEXCOORD0;
 			};
 
 			struct Interpolators
@@ -36,12 +49,15 @@ Shader "Custom/Rail"
 				float3 positionWS : TEXCOORD2;
 				float3 normalWS : TEXCOORD3;
 
+				float2 uv : TEXCOORD0;
+
 				#ifdef _MAIN_LIGHT_SHADOWS
 					float4 shadowCoord : TEXCOORD4;
 				#endif
 			};
 
 			float4 _BaseColor;
+			float _Length;
 
 			Interpolators Vertex(Attributes input)
 			{
@@ -53,6 +69,8 @@ Shader "Custom/Rail"
 				output.positionCS = pInputs.positionCS;
 				output.positionWS = pInputs.positionWS;
 				output.normalWS = nInputs.normalWS;
+				
+				output.uv = input.uv;
 
 				#ifdef _MAIN_LIGHT_SHADOWS
 					output.shadowCoord = GetShadowCoord(pInputs);
@@ -82,7 +100,9 @@ Shader "Custom/Rail"
 
 				float3 lit = bakedGI + diffuse;
 
-				return float4(lit * _BaseColor.rgb, 1);
+				float a = step(input.uv.y, _Length);
+
+				return float4(lit * _BaseColor.rgb, a);
 			}
 
             ENDHLSL
@@ -100,28 +120,34 @@ Shader "Custom/Rail"
 			#pragma fragment ShadowPassFragment
 			
 			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+			#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
 
 			struct Attributes
 			{
 				float4 positionOS   : POSITION;
 				float3 normalOS     : NORMAL;
+				float2 uv : TEXCOORD0;
 			};
 
 			struct Varyings
 			{
 				float4 positionCS   : SV_POSITION;
+				float2 uv : TEXCOORD0;
 			};
+
+			// Majority copied from Shadows.hlsl but excluding all of the stuff that gave me errors
 
 			float3 _LightDirection;
 			float3 _LightPosition;
 			float4 _ShadowBias;
+
+			float _Length;
 
 			float3 ApplyShadowBias(float3 positionWS, float3 normalWS, float3 lightDirection)
 			{
 				float invNdotL = 1.0 - saturate(dot(lightDirection, normalWS));
 			    float scale = invNdotL * _ShadowBias.y;
 
-				// normal bias is negative since we want to apply an inset normal offset
 				positionWS = lightDirection * _ShadowBias.xxx + positionWS;
 				positionWS = normalWS * scale.xxx + positionWS;
 				return positionWS;
@@ -154,12 +180,15 @@ Shader "Custom/Rail"
 				Varyings output;
 
 				output.positionCS = GetShadowPositionHClip(input);
+				output.uv = input.uv;
 				return output;
 			}
 
 			half4 ShadowPassFragment(Varyings input) : SV_TARGET
 			{
-				return 0;
+				clip(_Length - input.uv.y);
+
+				return 1.0f;
 			}
 			
 			ENDHLSL
