@@ -16,6 +16,10 @@ Shader "Custom/Moss"
 		_NoiseMax("Noise Max", Range(0.0, 1.0)) = 1.0
 
 		[Header(Color)][Space]
+		_Albedo("Albedo", 2D) = "white" {}
+
+		[Space]
+
 		_BaseColor("Base Color", Color) = (0, 0, 0, 1)
 		_TipColor("Tip Color", Color) = (1, 1, 1, 1)
 
@@ -35,6 +39,7 @@ Shader "Custom/Moss"
 		[Header(Blotches)][Space]
 		_BlotchTexture ("Blotch Texture", 2D) = "white" {}
 		_BlotchThreshold ("Blotch Threshold", Float) = 0.6
+		_BlotchPower ("Blotch Power", Float) = 3
 	}
 	SubShader
 	{
@@ -67,15 +72,16 @@ Shader "Custom/Moss"
 			struct Interpolators
 			{
 				float4 positionCS : SV_POSITION;
-				float3 positionWS : TEXCOORD3;
-				float3 normalWS : TEXCOORD4;
+				float3 positionWS : TEXCOORD4;
+				float3 normalWS : TEXCOORD5;
 
 				float2 uv : TEXCOORD0;
-				float2 noiseUV : TEXCOORD1;
-				float2 blotchUV : TEXCOORD2;
+				float2 baseUV : TEXCOORD1;
+				float2 noiseUV : TEXCOORD2;
+				float2 blotchUV : TEXCOORD3;
 
 				#ifdef _MAIN_LIGHT_SHADOWS
-					float4 shadowCoord : TEXCOORD5;
+					float4 shadowCoord : TEXCOORD6;
 				#endif
 			};
 
@@ -85,6 +91,9 @@ Shader "Custom/Moss"
 			float4 _NoiseTexture_ST;
 
 			float _NoiseMin, _NoiseMax;
+
+			TEXTURE2D(_Albedo);
+			float4 _Albedo_ST;
 
 			float4 _BaseColor, _TipColor;
 			float _FadeLength;
@@ -96,7 +105,7 @@ Shader "Custom/Moss"
 
 			TEXTURE2D(_BlotchTexture);
 			float4 _BlotchTexture_ST;
-			float _BlotchThreshold;
+			float _BlotchThreshold, _BlotchPower;
 
 			float _Length;
 
@@ -121,6 +130,7 @@ Shader "Custom/Moss"
 				output.normalWS = nInputs.normalWS;
 
 				output.uv = input.uv;
+				output.baseUV = TRANSFORM_TEX(input.uv, _Albedo);
 				output.noiseUV = TRANSFORM_TEX(input.uv, _NoiseTexture);
 				output.blotchUV = TRANSFORM_TEX(input.uv, _BlotchTexture);
 
@@ -153,7 +163,7 @@ Shader "Custom/Moss"
 				float noise = lerp(_NoiseMin, _NoiseMax, noiseSample.r);
 
 				float blotchSample = _BlotchTexture.Sample(sampler_bilinear_repeat, input.blotchUV).r;
-				float blotch = smoothstep(0, _BlotchThreshold, blotchSample);
+				float blotch = pow(smoothstep(0, _BlotchThreshold, blotchSample), _BlotchPower);
 
 				float inverseLength = step(_Length, input.uv.y);
 
@@ -161,14 +171,15 @@ Shader "Custom/Moss"
 				
 				if (threshold < 0) discard;
 
-				float3 ao = lerp(_BaseColor.rgb, _TipColor.rgb, clamp(h / _FadeLength, 0, 1));
+				float t = clamp(h / _FadeLength, 0, 1) * _Albedo.Sample(sampler_bilinear_repeat, input.baseUV).r;
+				float3 unlit = lerp(_BaseColor.rgb, _TipColor.rgb, t);
 
 				float3 bakedGI = SampleSH(input.normalWS);
 				float3 diffuse = Diffuse(input);
 
 				float3 lit = bakedGI + diffuse;
 
-				return float4(lit * ao, 1);
+				return float4(unlit * lit, 1);
 			}
 
 			ENDHLSL

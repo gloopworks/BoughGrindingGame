@@ -23,34 +23,39 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _Albedo:
+        m_Texture: {fileID: 2800000, guid: b5679771bd5ab1541802bbd3004fe881, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _BlotchTexture:
         m_Texture: {fileID: 2800000, guid: 362053907d9177449bf6cc4e2051a7fa, type: 3}
-        m_Scale: {x: 0.008, y: 0.004}
-        m_Offset: {x: 0.02, y: 0}
+        m_Scale: {x: 0.003, y: 0.0015}
+        m_Offset: {x: 0, y: 0}
     - _DisplacementNoiseTexture:
         m_Texture: {fileID: 2800000, guid: 362053907d9177449bf6cc4e2051a7fa, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NoiseTexture:
         m_Texture: {fileID: 2800000, guid: d8887be45c3de834bbc33d8c93dfce33, type: 3}
-        m_Scale: {x: 0.2, y: 0.1}
+        m_Scale: {x: 0.4, y: 0.2}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _BlotchPower: 50
     - _BlotchSize: 0.6
-    - _BlotchThreshold: 0.99
+    - _BlotchThreshold: 0.7
     - _DisplacementStrength: 0.3
     - _FadeLength: 0.6
     - _HeightPower: 1
     - _Length: 15.76
-    - _MaxDisplacementBreadth: 0.16
+    - _MaxDisplacementBreadth: 0.11
     - _MinDisplacementBreadth: 0.01
-    - _NoiseMax: 0.6
-    - _NoiseMin: 0.4
+    - _NoiseMax: 1
+    - _NoiseMin: 0
     - _NoisePower: 1
-    - _ShellCount: 16
+    - _ShellCount: 8
     - _ShellIndex: 0
     m_Colors:
-    - _BaseColor: {r: 0.11627802, g: 0.3679245, b: 0.20637372, a: 1}
-    - _TipColor: {r: 0.38327694, g: 0.8207547, b: 0.38948235, a: 1}
+    - _BaseColor: {r: 0.10964756, g: 0.3018868, b: 0.123782806, a: 1}
+    - _TipColor: {r: 0.376602, g: 0.8773585, b: 0.376602, a: 1}
   m_BuildTextureStacks: []

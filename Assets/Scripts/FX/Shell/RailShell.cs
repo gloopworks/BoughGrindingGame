@@ -5,7 +5,6 @@ namespace MixJam12.FX.Rails
     public class RailShell : MonoBehaviour
     {
         [Header("Asset References")]
-        [SerializeField] private Mesh shellMesh;
         [SerializeField] private Material shellMaterial;
 
         [Space, SerializeField] private bool updateSettingsRuntime;
@@ -13,7 +12,7 @@ namespace MixJam12.FX.Rails
         private MeshRenderer[] shells;
         private int shellCount;
 
-        public void GenerateShells()
+        public void GenerateShells(Mesh shellMesh)
         {
             shellCount = (int)shellMaterial.GetFloat("_ShellCount");
             shells = new MeshRenderer[shellCount];
@@ -36,7 +35,15 @@ namespace MixJam12.FX.Rails
             }
         }
 
-        private void UpdateShells()
+        public void UpdateLength(float length)
+        {
+            for (int i = 0; i < shellCount; i++)
+            {
+                shells[i].material.SetFloat("_Length", length);
+            }
+        }
+
+        private void UpdateShellsAll()
         {
             for (int i = 0; i < shellCount; i++)
             {
@@ -56,16 +63,12 @@ namespace MixJam12.FX.Rails
 
             shells = null;
         }
-        private void OnEnable()
-        {
-            GenerateShells();
-        }
 
         private void Update()
         {
             if (updateSettingsRuntime)
             {
-                UpdateShells();
+                UpdateShellsAll();
             }
         }
 

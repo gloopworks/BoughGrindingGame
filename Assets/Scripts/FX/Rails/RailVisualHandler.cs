@@ -5,12 +5,16 @@ namespace MixJam12.FX.Rails
 {
     public class RailVisualHandler : MonoBehaviour
     {
+        [Header("References")]
         [SerializeField] private SplineExtrude extrude;
         [SerializeField] private MeshFilter meshFilter;
         [SerializeField] private MeshRenderer meshRenderer;
 
         [Space]
 
+        [SerializeField] private RailShell shells;
+
+        [Header("Visual Settings")]
         [SerializeField, Range(0.0f, 100.0f)] private float growthSpeed = 10f;
 
         private Spline spline;
@@ -21,9 +25,13 @@ namespace MixJam12.FX.Rails
         {
             this.spline = spline;
 
-            meshFilter.mesh = new Mesh();
+            Mesh mesh = new();
+            meshFilter.mesh = mesh;
             currentLength = 0.0f;
             targetLength = spline.GetLength();
+
+            shells.GenerateShells(mesh);
+            shells.UpdateLength(currentLength);
 
             UpdateVisual();
         }
@@ -40,6 +48,7 @@ namespace MixJam12.FX.Rails
             {
                 currentLength = Mathf.MoveTowards(currentLength, targetLength, Time.deltaTime * growthSpeed);
                 meshRenderer.materials[0].SetFloat("_Length", currentLength);
+                shells.UpdateLength(currentLength);
             }
         }
     }

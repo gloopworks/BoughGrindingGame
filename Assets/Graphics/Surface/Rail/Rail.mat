@@ -37,7 +37,7 @@ Material:
     - _DisplacementBreadth: 0
     - _DisplacementStrength: 0.3
     - _Length: 1
-    - _NormalStrength: 3
+    - _NormalStrength: 5
     m_Colors:
     - _BaseColor: {r: 0.33962262, g: 0.27368647, b: 0.2226771, a: 1}
   m_BuildTextureStacks: []
