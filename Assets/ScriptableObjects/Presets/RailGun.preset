@@ -42,7 +42,7 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: floorOffset
-    value: 0.5
+    value: 0.2
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: ceilingOffset
@@ -54,11 +54,11 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: minTangentDistance
-    value: 0
+    value: 2
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: tangentDistanceCurve.m_Curve.Array.size
-    value: 5
+    value: 2
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: tangentDistanceCurve.m_Curve.Array.data[0].time
@@ -70,11 +70,11 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: tangentDistanceCurve.m_Curve.Array.data[0].inSlope
-    value: 2.7379637
+    value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: tangentDistanceCurve.m_Curve.Array.data[0].outSlope
-    value: 2.7379637
+    value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: tangentDistanceCurve.m_Curve.Array.data[0].tangentMode
@@ -90,23 +90,23 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: tangentDistanceCurve.m_Curve.Array.data[0].outWeight
-    value: 0.22327481
+    value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: tangentDistanceCurve.m_Curve.Array.data[1].time
-    value: 0.09860407
+    value: 1
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: tangentDistanceCurve.m_Curve.Array.data[1].value
-    value: 0.0967869
+    value: 1
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: tangentDistanceCurve.m_Curve.Array.data[1].inSlope
-    value: 0.06655054
+    value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: tangentDistanceCurve.m_Curve.Array.data[1].outSlope
-    value: 0.06655054
+    value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: tangentDistanceCurve.m_Curve.Array.data[1].tangentMode
@@ -118,106 +118,10 @@ Preset:
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: tangentDistanceCurve.m_Curve.Array.data[1].inWeight
-    value: 1
+    value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}
     propertyPath: tangentDistanceCurve.m_Curve.Array.data[1].outWeight
-    value: 0.1916535
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[2].time
-    value: 0.61779344
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[2].value
-    value: 0.11080651
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[2].inSlope
-    value: -0.017466124
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[2].outSlope
-    value: -0.017466124
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[2].tangentMode
-    value: 0
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[2].weightedMode
-    value: 0
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[2].inWeight
-    value: 0.30321902
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[2].outWeight
-    value: 0.77763385
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[3].time
-    value: 0.8499378
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[3].value
-    value: 0.2316151
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[3].inSlope
-    value: 1.6654273
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[3].outSlope
-    value: 1.6654273
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[3].tangentMode
-    value: 0
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[3].weightedMode
-    value: 0
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[3].inWeight
-    value: 0.2068924
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[3].outWeight
-    value: 0.40731704
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[4].time
-    value: 1
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[4].value
-    value: 1
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[4].inSlope
-    value: 7.2844543
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[4].outSlope
-    value: 7.2844543
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[4].tangentMode
-    value: 0
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[4].weightedMode
-    value: 0
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[4].inWeight
-    value: 0.14964855
-    objectReference: {fileID: 0}
-  - target: {fileID: 0}
-    propertyPath: tangentDistanceCurve.m_Curve.Array.data[4].outWeight
     value: 0
     objectReference: {fileID: 0}
   - target: {fileID: 0}

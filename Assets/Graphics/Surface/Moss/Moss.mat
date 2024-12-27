@@ -28,8 +28,8 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BlotchTexture:
-        m_Texture: {fileID: 2800000, guid: 362053907d9177449bf6cc4e2051a7fa, type: 3}
-        m_Scale: {x: 0.003, y: 0.0015}
+        m_Texture: {fileID: 2800000, guid: b5679771bd5ab1541802bbd3004fe881, type: 3}
+        m_Scale: {x: 0.2, y: 0.05}
         m_Offset: {x: 0, y: 0}
     - _DisplacementNoiseTexture:
         m_Texture: {fileID: 2800000, guid: 362053907d9177449bf6cc4e2051a7fa, type: 3}
@@ -43,11 +43,11 @@ Material:
     m_Floats:
     - _BlotchPower: 50
     - _BlotchSize: 0.6
-    - _BlotchThreshold: 0.7
+    - _BlotchThreshold: 0.6
     - _DisplacementStrength: 0.3
     - _FadeLength: 0.6
     - _HeightPower: 1
-    - _Length: 15.76
+    - _Length: 200
     - _MaxDisplacementBreadth: 0.11
     - _MinDisplacementBreadth: 0.01
     - _NoiseMax: 1
@@ -57,5 +57,5 @@ Material:
     - _ShellIndex: 0
     m_Colors:
     - _BaseColor: {r: 0.10964756, g: 0.3018868, b: 0.123782806, a: 1}
-    - _TipColor: {r: 0.376602, g: 0.8773585, b: 0.376602, a: 1}
+    - _TipColor: {r: 0.32079923, g: 0.764151, b: 0.32079923, a: 1}
   m_BuildTextureStacks: []

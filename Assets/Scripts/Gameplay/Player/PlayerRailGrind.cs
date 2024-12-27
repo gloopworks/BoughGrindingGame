@@ -124,7 +124,8 @@ namespace MixJam12.Gameplay.Player
             Vector3 localPoint = parent.InverseTransformPoint(body.position);
             _ = GetNearestPoint(spline, localPoint, out var nearestPoint, out t);
 
-            Vector3 up = spline.EvaluateUpVector(t);
+            //Vector3 up = spline.EvaluateUpVector(t);
+            Vector3 up = Vector3.up;
 
             Vector3 global = parent.TransformPoint(nearestPoint);
             return global + (up * verticalOffset);
